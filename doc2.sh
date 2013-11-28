@@ -68,6 +68,9 @@ cd ~/build/
 if [ "$T" == "prod" ]
 then
     #PROD SERVER
+
+    #set custom.properties
+    sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/trunk/eas/resources/custom.properties_prod
     svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$S/ prod/ --username=$U --password=$P
     cd ~/build/prod/eas/resources/	
     cd ~/build/prod/eas/
@@ -142,6 +145,10 @@ then
 #--------------------------------------------------------------------------------------------------------------------------------------#
 else
     #TEST SERVER
+
+    #set custom.properties
+    sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/trunk/eas/resources/custom.properties_prod
+
     svn checkout https://motive.svn.beanstalkapp.com/eas/trunk/ trunk/ --username=$U --password=$P    
     cd ~/build/trunk/eas/resources/
     cd ~/build/trunk/eas/
