@@ -8,6 +8,7 @@ U=""
 T=""
 S=""
 V=""
+D=""
 
 #check rights
 if [ "$(id -u)" != "0" ]; then
@@ -25,7 +26,7 @@ fi
 if [ "$#" -eq 10 ]
 then
         echo -e "\t\t Parsing params..."
-        while getopts "u:p:t:s:v:" opt; do
+        while getopts "u:p:t:s:v:d:" opt; do
             case "$opt" in
             u) U=$OPTARG
                 ;;
@@ -37,6 +38,8 @@ then
 		;;
 	    v) V=$OPTARG
 		;;
+	    d) D=$OPTARG
+		;;
             esac
         done
         echo -e "\tSCRIPT EXECUTED WITH NEXT PARAMETERS:\n"
@@ -45,6 +48,7 @@ then
         echo -e "-t - ENVIRONMENT: $T\n"
         echo -e "-s - SPRINT NAME: $S\n"
         echo -e "-v - VERSION: $V\n"
+        echo -e "-d - DB PASSWORD: $D\n"
         read -sn 1 -p "Check them and press any key to continue..."
         echo -e "\n"
 else
