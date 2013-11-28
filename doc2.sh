@@ -7,6 +7,7 @@ P=""
 U=""
 T=""
 S=""
+V=""
 
 #check rights
 if [ "$(id -u)" != "0" ]; then
@@ -24,7 +25,7 @@ fi
 if [ "$#" -eq 8 ] #because  (-t test -u bogdan -p qwerty -s sprint_name == 8)
 then
         echo -e "\t\t Parsing params..."
-        while getopts "u:p:t:s:" opt; do
+        while getopts "u:p:t:s:v" opt; do
             case "$opt" in
             u) U=$OPTARG
                 ;;
@@ -34,6 +35,8 @@ then
                 ;;
 	    s) S=$OPTARG
 		;;
+	    v) V=$OPTARG
+		;;
             esac
         done
         echo -e "\tSCRIPT EXECUTED WITH NEXT PARAMETERS:\n"
@@ -41,14 +44,15 @@ then
         echo -e "-p - SVN PASSWORD: $P\n"       
         echo -e "-t - ENVIRONMENT: $T\n"
         echo -e "-s - SPRINT NAME: $S\n"
+        echo -e "-v - VERSION: $V\n"
         read -sn 1 -p "Check them and press any key to continue..."
         echo -e "\n"
 else
   echo -e "\nscript usage:\n"
-  echo -e "$0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test)\n"
-  echo -e "Example1: $0 -u bogdan -s sprint_name -p qwerty -t test \n"
-  echo -e "Example2: $0 -u bogdan -s sprint_name -p qwerty -t prod \n"
-  echo -e "Example3: $0 -u bogdan -s sprint_name -p qwerty -t BLA_BLA_BLA_BLA_INFO \n"
+  echo -e "$0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test) -v 1.2.4\n"
+  echo -e "Example1: $0 -u bogdan -s sprint_name -p qwerty -t test -v 1.2.4\n"
+  echo -e "Example2: $0 -u bogdan -s sprint_name -p qwerty -t prod -v 1.2.4\n"
+  echo -e "Example3: $0 -u bogdan -s sprint_name -p qwerty -t BLA_BLA_INFO -v 1.2.4 \n"
   exit 1;
 fi
 
