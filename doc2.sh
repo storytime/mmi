@@ -17,12 +17,12 @@ fi
 
 #check OS 
 if ! cat /etc/redhat-release | grep -iE 'centos|rhel|fedora|red|hat'; then
-    echo -e "\nIncorrect OS!!!!!!!\n"
+    echo -e "\nIncorrect OS!\n"
     exit 1;
 fi
 
 #parse args
-if [ "$#" -eq 8 ] #because  (-t test -u bogdan -p qwerty -s sprint_name == 8)
+if [ "$#" -eq 10 ]
 then
         echo -e "\t\t Parsing params..."
         while getopts "u:p:t:s:v" opt; do
