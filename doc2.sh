@@ -23,7 +23,7 @@ if ! cat /etc/redhat-release | grep -iE 'centos|rhel|fedora|red|hat'; then
 fi
 
 #parse args
-if [ "$#" -eq 10 ]
+if [ ! "$#" -lt 8 ]
 then
         echo -e "\t\t Parsing params..."
         while getopts "u:p:t:s:v:d:" opt; do
@@ -53,15 +53,16 @@ then
         echo -e "\n"
 else
   echo -e "\nscript usage:\n"
-  echo -e "$0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test) -v 1.2.4\n"
-  echo -e "Example1: $0 -s trunk -u bogdan -p qwerty -t test -v 1.2.4\n"
-  echo -e "Example2: $0 -s sprint_name -u bogdan -p qwerty -t prod -v 1.2.4\n"
-  echo -e "Example3: $0 -s sprint_name -u bogdan -p qwerty -t BLA_BLA_INFO -v 1.2.4 \n"
+  echo -e "$0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test) -v 1.2.4 -p db_password \n"
+  echo -e "Example1: $0 -u bogdan -p qwerty -t test -v 1.2.4 \n"
+  echo -e "Example2: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -v 1.2.4 -d db_password     #will set prod db password: db_password \n"
+  echo -e "Example3: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -v 1.2.4 -d     #will delete prod db password from all configs \n"
+  echo -e "Example4: $0 -s sprint_name -u bogdan -p qwerty -t BLA_BLA_INFO -v 1.2.4 \n"
   exit 1;
 fi
 
 
-#create test dir
+#create-remove test dir
 rm -rf ~/build/
 mkdir -p ~/build/
 cd ~/build/
@@ -74,24 +75,30 @@ if [ "$T" == "prod" ]
 then
     #PROD SERVER
 
+    #checkout from repo
+    svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$S/ prod/ --username=$U --password=$P
+
+    #get DEFAULT_DB_PASSWORD
+    DEFAULT_DB_PASSWORD=$(cat  ~/build/prod/notification-manager/custom.properties_prod | grep -i db_password | grep -v "#" | awk -F '=' '{ print $2 }')
+    if [ "$D" == "default" ]
+	then
+	    D=$DEFAULT_DB_PASSWORD
+    fi		
+
     #set custom.properties
     dos2unix ~/build/prod/eas/resources/custom.properties_prod
     sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/prod/eas/resources/custom.properties_prod
 
-    #change win to unix encoding
+    #change win to unix encoding, fix configs, remove DB passwords from config files
     dos2unix ~/build/prod/notification-manager/custom.properties_prod
-    dos2unix ~/build/prod/solr/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
-    dos2unix ~/build/prod/flyway-2.2.1/conf/flyway.properties_prod
-    dos2unix ~/build/prod/eas/resources/eas-dao.properties_prod
+    sed -i -r 's/db_password=.*/db_password='$D'/' ~/build/prod/notification-manager/custom.properties_prod
 
-    #remove DB passwords from config files
-    sed -i -r 's/db_password=.*/db_password=/' ~/build/prod/notification-manager/custom.properties_prod
-    sed -i -r 's/password=.*/password="" \/>/' ~/build/prod/solr/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
-    sed -i -r 's/flyway.password=.*/flyway.password=/' ~/build/prod/flyway-2.2.1/conf/flyway.properties_prod
-    sed -i -r 's/MySQL_EAS.connection.password=.*/MySQL_EAS.connection.password=/' ~/build/prod/eas/resources/eas-dao.properties_prod
+    dos2unix ~/build/prod/flyway-2.2.1/conf/flyway.properties_prod
+    sed -i -r 's/flyway.password=.*/flyway.password='$D'/' ~/build/prod/flyway-2.2.1/conf/flyway.properties_prod
+
+    dos2unix ~/build/prod/eas/resources/eas-dao.properties_prod
+    sed -i -r 's/MySQL_EAS.connection.password=.*/MySQL_EAS.connection.password='$D'/' ~/build/prod/eas/resources/eas-dao.properties_prod
     
-    #checkout from repo
-    svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$S/ prod/ --username=$U --password=$P
     cd ~/build/prod/eas/resources/	
     cd ~/build/prod/eas/
     #build
@@ -103,11 +110,6 @@ then
     #Switch the flyway parameter file for production only 
     cd ~/build/prod/flyway-2.2.1/conf
     cp -rf flyway.properties_prod flyway.properties
-    #Switch the solr parameter file for production only (point to RDS database):
-        #PLEASE NOTE!
-        #In these config (flyway.properties and solr-eas-config.xml) used user/password
-        #user="eas" password="1eas2eas!". As we discussed in Skype. This user in ONLY FOR 
-        #PRODUCTION AND I WILL BE CREATED AUTOMATICALLY ETC.
     cd ~/build/prod/solr/new_mentor/solr/eas/conf
     cp -rf solr-eas-config_prod.xml solr-eas-config.xml
     
@@ -119,7 +121,7 @@ then
     kill -9 $(ps aux | grep -v grep | grep -i notifications | grep -i jar |  awk -F ' ' '{ print $2 }')
     kill -9 $(ps aux | grep -v grep | grep -i solr |  awk -F ' ' '{ print $2 }')
     kill -9 $(ps aux | grep -v grep | grep -i tomcat | grep -iv grep |  awk -F ' ' '{ print $2 }')
-    # mysql -u eas -p1eas2eas! -h eas-prod-db.ccc4r0vems7f.us-west-1.rds.amazonaws.com
+    # mysql host: eas-prod-db.ccc4r0vems7f.us-west-1.rds.amazonaws.com
     
     #Flyway migration - use  flyway.properties
     cd	 ~/build/prod/flyway-2.2.1
@@ -131,6 +133,10 @@ then
     cd /usr/local/solr/prod/new_mentor
     rm -rf solr/
     svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$S/solr/new_mentor/solr/ solr/  --username=$U --password=$P
+
+    dos2unix /usr/local/solr/prod/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
+    sed -i -r 's/password=.*/password="'$D'" \/>/' /usr/local/solr/prod/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
+
     cd /usr/local/solr/prod/new_mentor/solr
     cp /usr/local/solr/prod/start.jar .
     cd /usr/local/solr/prod
@@ -165,11 +171,12 @@ then
 #--------------------------------------------------------------------------------------------------------------------------------------#
 else
     #TEST SERVER
+    svn checkout https://motive.svn.beanstalkapp.com/eas/trunk/ trunk/ --username=$U --password=$P    
 
     #set custom.properties
+    dos2unix ~/build/trunk/eas/resources/custom.properties_awstest
     sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/trunk/eas/resources/custom.properties_awstest
 
-    svn checkout https://motive.svn.beanstalkapp.com/eas/trunk/ trunk/ --username=$U --password=$P    
     cd ~/build/trunk/eas/resources/
     cd ~/build/trunk/eas/
     #build
@@ -236,4 +243,8 @@ fi
 read -sn 1 -p "Server: $T has been configured. Then press any key to exit... and wait 4-5min. Tomcat is starting!"
 echo -e "\n"
 
+#create-remove test dir
+rm -rf ~/build/
+mkdir -p ~/build/
+cd ~/build/
 
