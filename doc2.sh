@@ -25,7 +25,7 @@ fi
 if [ "$#" -eq 10 ]
 then
         echo -e "\t\t Parsing params..."
-        while getopts "u:p:t:s:v" opt; do
+        while getopts "u:p:t:s:v:" opt; do
             case "$opt" in
             u) U=$OPTARG
                 ;;
@@ -50,14 +50,15 @@ then
 else
   echo -e "\nscript usage:\n"
   echo -e "$0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test) -v 1.2.4\n"
-  echo -e "Example1: $0 -u bogdan -s sprint_name -p qwerty -t test -v 1.2.4\n"
-  echo -e "Example2: $0 -u bogdan -s sprint_name -p qwerty -t prod -v 1.2.4\n"
-  echo -e "Example3: $0 -u bogdan -s sprint_name -p qwerty -t BLA_BLA_INFO -v 1.2.4 \n"
+  echo -e "Example1: $0 -s trunk -u bogdan -p qwerty -t test -v 1.2.4\n"
+  echo -e "Example2: $0 -s sprint_name -u bogdan -p qwerty -t prod -v 1.2.4\n"
+  echo -e "Example3: $0 -s sprint_name -u bogdan -p qwerty -t BLA_BLA_INFO -v 1.2.4 \n"
   exit 1;
 fi
 
 
 #create test dir
+rm -rf ~/build/
 mkdir -p ~/build/
 cd ~/build/
 
@@ -70,7 +71,22 @@ then
     #PROD SERVER
 
     #set custom.properties
-    sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/trunk/eas/resources/custom.properties_prod
+    dos2unix ~/build/prod/eas/resources/custom.properties_prod
+    sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/prod/eas/resources/custom.properties_prod
+
+    #change win to unix encoding
+    dos2unix ~/build/prod/notification-manager/custom.properties_prod
+    dos2unix ~/build/prod/solr/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
+    dos2unix ~/build/prod/flyway-2.2.1/conf/flyway.properties_prod
+    dos2unix ~/build/prod/eas/resources/eas-dao.properties_prod
+
+    #remove DB passwords from config files
+    sed -i -r 's/db_password=.*/db_password=/' ~/build/prod/notification-manager/custom.properties_prod
+    sed -i -r 's/password=.*/password="" \/>/' ~/build/prod/solr/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
+    sed -i -r 's/flyway.password=.*/flyway.password=/' ~/build/prod/flyway-2.2.1/conf/flyway.properties_prod
+    sed -i -r 's/MySQL_EAS.connection.password=.*/MySQL_EAS.connection.password=/' ~/build/prod/eas/resources/eas-dao.properties_prod
+    
+    #checkout from repo
     svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$S/ prod/ --username=$U --password=$P
     cd ~/build/prod/eas/resources/	
     cd ~/build/prod/eas/
@@ -147,7 +163,7 @@ else
     #TEST SERVER
 
     #set custom.properties
-    sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/trunk/eas/resources/custom.properties_prod
+    sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/trunk/eas/resources/custom.properties_awstest
 
     svn checkout https://motive.svn.beanstalkapp.com/eas/trunk/ trunk/ --username=$U --password=$P    
     cd ~/build/trunk/eas/resources/

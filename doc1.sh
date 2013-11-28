@@ -92,10 +92,10 @@ fi
 yum -y update && yum -y upgrade
 
 #install OpenJDK 1.7
-yum install -y java-1.7.0-openjdk.x86_64 java-1.7.0-openjdk-devel.x86_64
+yum install -y java-1.7.0-openjdk.x86_64 java-1.7.0-openjdk-devel.x86_64 dos2unix
 
 #install packages
-yum install -y ant subversion
+yum install -y ant subversion 
 
 #set java home
 export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/
