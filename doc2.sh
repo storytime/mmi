@@ -48,7 +48,7 @@ then
         echo -e "-t - ENVIRONMENT: $T\n"
         echo -e "-s - SPRINT NAME: $S\n"
         echo -e "-v - VERSION: $V\n"
-        echo -e "-d - DB PASSWORD: $D\n"
+        echo -e "-d - DB PASSWORD: $D This is applied ONLY FOR PROD server\n"
         read -sn 1 -p "Check them and press any key to continue..."
         echo -e "\n"
 else
@@ -142,7 +142,7 @@ then
     cd /usr/local/solr/prod
     touch solr.sh
     chmod +x solr.sh
-    echo -e "java -Dsolr.solr.home=/usr/local/solr/prod/new_mentor/solr/ -jar start.jar > /usr/local/solr/prod/new_mentor/solr/solr.log 2>&1 &" > solr.sh
+    echo -e "java -Dsolr.solr.home=/usr/local/solr/prod/new_mentor/solr/ -jar start.jar > /var/log/solr.log 2>&1 &" > solr.sh
     ./solr.sh
     read -sn 1 -p 'Going to start solr. Press any key to continue... and wait 45 sec.';echo
     sleep 45
@@ -166,7 +166,7 @@ then
    cp ~/build/prod/notification-manager/review_request.st .
    chmod +x notifications.sh
    sed -i -e 's/\r$//' notifications.sh
-   ./notifications.sh /dev/null 2>&1
+   java -jar -Dlog4j.configuration=file:./log4j.properties notifications.jar > /var/log/notification.log 2>&1 &
 
 #--------------------------------------------------------------------------------------------------------------------------------------#
 else
@@ -212,7 +212,7 @@ else
     cp /usr/local/solr/trunk/start.jar .
     cd /usr/local/solr/trunk  
     chmod +x solr.sh
-    echo -e "java -Dsolr.solr.home=/usr/local/solr/trunk/new_mentor/solr/ -jar start.jar > /usr/local/solr/trunk/solr/solr.log 2>&1 &" > solr.sh
+    echo -e "java -Dsolr.solr.home=/usr/local/solr/trunk/new_mentor/solr/ -jar start.jar >  /var/log/solr.log 2>&1 &" > solr.sh
     ./solr.sh
     read -sn 1 -p 'Going to start solr. Press any key to continue... and wait 45 sec.';echo
     sleep 45
@@ -236,7 +236,7 @@ else
    cp ~/build/trunk/notification-manager/review_request.st .
    chmod +x notifications.sh
    sed -i -e 's/\r$//' notifications.sh
-   ./notifications.sh /dev/null 2>&1
+   java -jar -Dlog4j.configuration=file:./log4j.properties notifications.jar > /var/log/notification.log 2>&1 &
 
 fi
 
