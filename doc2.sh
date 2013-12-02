@@ -57,6 +57,7 @@ else
   echo -e "$0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test) -v 1.2.4 -p db_password \n"
   echo -e "Example1: $0 -u bogdan -p qwerty -t test -v 1.2.4 \n"
   echo -e "Example2: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -v 1.2.4 -d db_password     #will set prod db password: db_password \n"
+  echo -e "Example2: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -v 1.2.4 -d default     #default password will be used \n"
   echo -e "Example3: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -v 1.2.4 -d     #will delete prod db password from all configs \n"
   echo -e "Example4: $0 -s sprint_name -u bogdan -p qwerty -t BLA_BLA_INFO -v 1.2.4 \n"
   exit 1;
