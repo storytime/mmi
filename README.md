@@ -1,4 +1,4 @@
 mmi
 ===
 
-mmi install
+MMI install script.
