@@ -136,7 +136,10 @@ then
 fi
 
 ############################install tomcat7 section############################ 
-TOMCAT="http://mirror.nl.webzilla.com/apache/tomcat/tomcat-7/v7.0.47/bin/apache-tomcat-7.0.47.tar.gz"
+wget -q http://archive.apache.org/dist/tomcat/tomcat-7/?C=M;O=A
+CURRENT_VERSION=$(cat index.html\?C\=M  | grep -vi beta |grep -i folder.gif | grep  7.0.* | tail -1 | awk -F 'v' '{ print $2 }'| awk -F '/' '{ print $1 }');
+
+TOMCAT="http://archive.apache.org/dist/tomcat/tomcat-7/v$CURRENT_VERSION/bin/apache-tomcat-$CURRENT_VERSION.tar.gz"
 T7PATH="/usr/local/tomcat7/"
 T7LIB="/usr/local/tomcat7/lib/"
 
