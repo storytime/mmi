@@ -1,4 +1,5 @@
-mmi
+Projects
 ===
 
-MMI install script.
+OpenClinica - openclinika/
+MMI - mm1/
