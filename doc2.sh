@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# http://ec2-54-219-59-129.us-west-1.compute.amazonaws.com:8983/solr/
-# ssh -p22022 -i .ssh/motive2Key.pem root@ec2-54-219-59-129.us-west-1.compute.amazonaws.com
+# http://ec2-54-219-68-102.us-west-1.compute.amazonaws.com:8983/solr/
+# ssh -p22022 -i .ssh/motive2Key.pem root@ec2-54-219-68-102.us-west-1.compute.amazonaws.com
 
 trap '' INT
 P=""

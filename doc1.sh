@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# http://ec2-54-219-59-129.us-west-1.compute.amazonaws.com:8983/solr/
-# ssh -p22022 -i .ssh/motive2Key.pem root@ec2-54-219-59-129.us-west-1.compute.amazonaws.com
+# http://ec2-54-219-68-102.us-west-1.compute.amazonaws.com:8983/solr/
+# ssh -p22022 -i .ssh/motive2Key.pem root@ec2-54-219-68-102.us-west-1.compute.amazonaws.com
 
 trap '' INT
 P=""
@@ -58,6 +58,7 @@ ROOT_FS=$(cat /etc/fstab | head -1 |  awk -F ' ' '{ print $1}')
 ROOT_FS_SIZE=$(df -h | grep $ROOT_FS |   awk -F ' ' '{ print $2}')
 echo -e "\n\tRoot partion is: $ROOT_FS. \n Size before resize: $ROOT_FS_SIZE\n"
 resize2fs $ROOT_FS
+ROOT_FS_SIZE=$(df -h | grep $ROOT_FS |   awk -F ' ' '{ print $2}')
 echo -e "\n\tRoot partion is: $ROOT_FS. \tCurrent size: $ROOT_FS_SIZE\n"
 read -sn 1 -p "Press any key to continue..."
 
