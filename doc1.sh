@@ -296,5 +296,6 @@ fi
 read -sn 1 -p "Server: $T has been configured. Then press any key to exit..."
 echo -e "\n"
 
+/bin/bash
 
 
