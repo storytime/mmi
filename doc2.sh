@@ -213,6 +213,7 @@ else
     cd /usr/local/solr/trunk/new_mentor/solr
     cp /usr/local/solr/trunk/start.jar .
     cd /usr/local/solr/trunk  
+    touch solr.sh
     chmod +x solr.sh
     echo -e "java -Dsolr.solr.home=/usr/local/solr/trunk/new_mentor/solr/ -jar start.jar >  /var/log/solr.log 2>&1 &" > solr.sh
     ./solr.sh
