@@ -196,8 +196,8 @@ else
     echo -e "eas.war: ~/build/trunk/eas/output/dist/eas.war\n"
     echo -e "\t Going to stop sorl, tomcat and notification.\n"
     kill -9 $(ps auxw | grep -iv grep | grep -i notifications | grep -i jar |  awk -F ' ' '{ print $2 }')
-    kill -9 $(ps auxww | grep -v grep | grep -i solr |  awk -F ' ' '{ print $2 }')
-    kill -9 $(ps aux | grep -i tomcat | grep -iv grep |  awk -F ' ' '{ print $2 }')
+    kill -9 $(ps auxw | grep -v grep | grep -i solr |  awk -F ' ' '{ print $2 }')
+    kill -9 $(ps auxw | grep -i tomcat | grep -iv grep |  awk -F ' ' '{ print $2 }')
     # mysql -u eas -p1eas2eas! -h eas-prod-db.ccc4r0vems7f.us-west-1.rds.amazonaws.com
     
     #Flyway migration - use  flyway.properties
