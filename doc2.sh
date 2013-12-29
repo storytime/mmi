@@ -10,6 +10,7 @@ T=""
 S=""
 V=""
 D=""
+R=""
 
 #check rights
 if [ "$(id -u)" != "0" ]; then
@@ -27,7 +28,7 @@ fi
 if [ ! "$#" -lt 8 ]
 then
         echo -e "\t\t Parsing params..."
-        while getopts "u:p:t:s:v:d:" opt; do
+        while getopts "r:u:p:t:s:v:d:" opt; do
             case "$opt" in
             u) U=$OPTARG
                 ;;
@@ -39,6 +40,8 @@ then
 		;;
 	    v) V=$OPTARG
 		;;
+	    r) R=$OPTARG
+		;;
 	    d) D=$OPTARG
 		;;
             esac
@@ -49,17 +52,19 @@ then
         echo -e "-t - ENVIRONMENT: $T\n"
         echo -e "-s - SPRINT NAME: $S\n"
         echo -e "-v - VERSION: $V\n"
+        echo -e "-r - relative_host_url: $R (if it's empty, default value will be used;)\n"
         echo -e "-d - DB PASSWORD: $D This is applied ONLY FOR PROD server\n"
         read -sn 1 -p "Check them and press any key to continue..."
         echo -e "\n"
 else
   echo -e "\nscript usage:\n"
-  echo -e "$0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test) -v 1.2.4 -p db_password \n"
-  echo -e "Example1: $0 -u bogdan -p qwerty -t test -v 1.2.4 \n"
-  echo -e "Example2: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -v 1.2.4 -d db_password     #will set prod db password: db_password \n"
-  echo -e "Example2: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -v 1.2.4 -d default     #default password will be used \n"
-  echo -e "Example3: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -v 1.2.4 -d     #will delete prod db password from all configs \n"
-  echo -e "Example4: $0 -s sprint_name -u bogdan -p qwerty -t BLA_BLA_INFO -v 1.2.4 \n"
+  echo -e "$0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test) -r relative_host_url -v 1.2.4 -p db_password \n"
+  echo -e "Example1: $0 -u bogdan -p qwerty -t test -v 1.2.4 -r relative_host_url\n"
+  echo -e "Example2: $0 -u bogdan -p qwerty -t test -v 1.2.4\n"
+  echo -e "Example3: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -r relative_host_url -v 1.2.4 -d db_password     #will set prod db password: db_password \n"
+  echo -e "Example4: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -r relative_host_url -v 1.2.4 -d default     #default password will be used \n"
+  echo -e "Example5: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -r relative_host_url -v 1.2.4 -d     #will delete prod db password from all configs \n"
+  echo -e "Example6: $0 -s sprint_name -u bogdan -p qwerty -r relative_host_url -t BLA_BLA_INFO -v 1.2.4 \n"
   exit 1;
 fi
 
@@ -85,11 +90,16 @@ then
     if [ "$D" == "default" ]
 	then
 	    D=$DEFAULT_DB_PASSWORD
-    fi		
+    fi
 
     #set custom.properties
     dos2unix ~/build/prod/eas/resources/custom.properties_prod
     sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/prod/eas/resources/custom.properties_prod
+   
+    #check and set relative_host_url
+    if ! [ -z "$R" ]; then
+	 sed -i -r 's/relative_host_url=.*/relative_host_url=\/\/'$R'/'  ~/build/prod/eas/resources/custom.properties_prod
+    fi
 
     #change win to unix encoding, fix configs, remove DB passwords from config files
     dos2unix ~/build/prod/notification-manager/custom.properties_prod
@@ -178,6 +188,11 @@ else
     #set custom.properties
     dos2unix ~/build/trunk/eas/resources/custom.properties_awstest
     sed -i -r 's/build_version=.*/build_version='$V'/'  ~/build/trunk/eas/resources/custom.properties_awstest
+
+    #set relative_host_url
+    if ! [ -z "$R" ]; then
+	 sed -i -r 's/relative_host_url=.*/relative_host_url=\/\/'$R'/'  ~/build/trunk/eas/resources/custom.properties_awstest
+    fi
 
     cd ~/build/trunk/eas/resources/
     cd ~/build/trunk/eas/
