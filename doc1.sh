@@ -51,7 +51,6 @@ else
   exit 1;
 fi
 
-
 #fix size
 echo -e "\t\t Going to fix ROOT patition size. PLEASE DON'T STOP SCRIPT !!!\n"
 ROOT_FS=$(cat /etc/fstab | head -1 |  awk -F ' ' '{ print $1}')
@@ -218,7 +217,7 @@ mkdir -p /usr/eas/notifications
 service tomcat7 start
 echo -e "-----> Tomcat has been install; Port 7498; To restart tomcat: service tomcat7 restart"
 
-#Upload other stuff
+#other stuff
 cd /
 mkdir -p temp/atomikos-sw-tmp
 chmod -R 777 temp/
@@ -297,5 +296,4 @@ read -sn 1 -p "Server: $T has been configured. Then press any key to exit..."
 echo -e "\n"
 
 /bin/bash
-
 
