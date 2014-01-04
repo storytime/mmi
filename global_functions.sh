@@ -9,22 +9,27 @@ P=""
 U=""
 T=""
 S=""
-D="########## ###### ### # =========================================================>"
+SEP="---------- ########## ###### ### # =========================================================>\t"
+
+V=""
+D=""
+R=""
 
 TOMCAT=""
 T7PATH="/usr/local/tomcat7/"
 T7LIB="/usr/local/tomcat7/lib/"
 
-## ------------------- functions section ---------------------- ###
+## ------------------- doc1 functions section ---------------------- ###
 list_functions() {
   msg "\n"
+  msg "	--------------------------------- doc1 ------------------------------------------- "
   msg "	- msg() - print message; Input parameters: message to print"
-  msg "	- stop_exec() - stop current script proces;"
+  msg "	- stop_exec() - stop current script process;"
   msg "	- check_rights() - check rights; if super user"
   msg "	- doc1_help () - print doc1 help"
-  msg "	- doc1_greeting() - print greetings doc1 messge"
+  msg "	- doc1_greeting() - print greetings doc1 message"
   msg " - compare_count() - compare args count; Input parameters: digits for compare"
-  msg " - parse_args() - parse command line arguments; Input parameters: parameters to parse"
+  msg " - parse_args() - parse doc1 command line arguments; Input parameters: parameters to parse"
   msg " - resize_root_fs() - resize root fs size / fix size"
   msg " - change_ssh_port() - change SSH port; Input parameters: ssh port number"
   msg " - add_iptables_rules() - add firewall and save rules; Input parameters: port number"
@@ -39,6 +44,22 @@ list_functions() {
   msg " - setup_tomcat_config() - setup tomcat config"
   msg " - other_stuff() - other stuff"
   msg " - solr_setup()  - setup solr"
+
+  msg "	--------------------------------- doc2 ------------------------------------------- "
+  msg " - check_os() - check if CentOS/Fedora/RHEL/"
+  msg "	- doc2_help() - print doc1 help"
+  msg "	- doc2_greetings() - print greetings doc1 message"
+  msg "	- create_remove_dirs - remove and create ne dirs"
+  msg " - parse_args_doc2() - parse doc2 command line arguments; Input parameters: parameters to parse"
+  msg " - check_env_type() - check env type; Input parameters: env"
+  msg " - ch_code() - Checkout SVN code. Input parameters: env  type; SVN user; SVN password; sprint name or trunk"
+  msg " - change_prod_db_password() - Change DB password. Input parameters: env type(-t)"
+  msg " - set_build_version() - Set build version. Input parameters: env type; build version(-v)"
+  msg " - set_relative_url() - Set relative version. Input parameters: env type; relative URL(-r)"  
+  msg " - change_prod_configs() - Set change prod configs. Input parameters: env type; db password (-d)"
+  msg " - build_eas() - build eas war via ant. Input parameters: env type"
+  msg " - build_notif_manager() - build notif manager via ant. Input parameters: env type"
+
 }
 
 #print message
@@ -50,7 +71,7 @@ stop_exec() { kill -9 $(ps aux | grep $$ | grep -v grep |  awk -F ' ' '{ print $
 #check rights
 check_rights() {
  if [ "$(id -u)" != "0" ]; then
-   msg "$D\t This script must be run as root or be in /etc/sudoers";
+   msg "$SEP This script must be run as root or be in /etc/sudoers";
    stop_exec;
  fi
 }
@@ -77,7 +98,7 @@ doc1_greeting() {
 
 #compare arg count
 compare_count() {
- if [ "$1" -eq $2 ] 
+ if [ "$1" -ge $2 ] 
   then
     return 0
   else 
@@ -89,7 +110,7 @@ compare_count() {
 parse_args() {
 if (compare_count "$#" 8 ) #call compare; 8 - because (-t test -u bogdan -p qwerty -s y/n)
    then
-      msg "$D\t Parsing params..."	
+      msg "$SEP Parsing params... $#"	
 	while getopts "s:u:p:t:" opt; do
 	  case "$opt" in
 	   u) U=${OPTARG};;
@@ -111,7 +132,7 @@ if (compare_count "$#" 8 ) #call compare; 8 - because (-t test -u bogdan -p qwer
 
 #fix root fs size
 resize_root_fs() {
- msg "$D\t Going to fix ROOT patition size. PLEASE DON'T STOP SCRIPT !!!\n"
+ msg "$SEP Going to fix ROOT patition size. PLEASE DON'T STOP SCRIPT !!!\n"
  ROOT_FS=$(cat /etc/fstab | head -1 |  awk -F ' ' '{ print $1}')
  ROOT_FS_SIZE=$(df -h | grep $ROOT_FS |   awk -F ' ' '{ print $2}')
  msg "\n\tRoot partion is: $ROOT_FS. \n\tSize before resize: $ROOT_FS_SIZE\n"
@@ -128,7 +149,7 @@ change_ssh_port() {
  service sshd restart
  sed -i 's/^#PasswordAuthentication/PasswordAuthentication/g' /etc/ssh/sshd_config
  service sshd restart
- msg "$D\t SSH port: $1\n"
+ msg "$SEP SSH port: $1\n"
  return 0
 }
 
@@ -137,8 +158,8 @@ add_iptables_rules() {
  iptables -I INPUT -p tcp --dport $1 -j ACCEPT
  /etc/init.d/iptables status | grep $1
  /etc/init.d/iptables save
- msg "\n$D\t SSH port is changed to $1; FIREWALL HAVE BEEN UPDATED. PLEASE NOTE: ADD PORT $1 TO SECURITY AWS GROUP."
- msg "$D\t ssh login will be like this: ssh -p $1 -i motive2Key.pem root@AWS-PUBLIC-DNS."
+ msg "\n$SEP SSH port is changed to $1; FIREWALL HAVE BEEN UPDATED. PLEASE NOTE: ADD PORT $1 TO SECURITY AWS GROUP."
+ msg "$SEP SSH login will be like this: ssh -p $1 -i motive2Key.pem root@AWS-PUBLIC-DNS."
  return 0
 }
 
@@ -146,14 +167,14 @@ add_iptables_rules() {
 sys_up() {
  yum -y update 
  yum -y upgrade
- msg "$D\t system has been updated."
+ msg "$SEP system has been updated."
  return 0
 }
 
 #install packages
 get_pack() {
  yum install -y $@
- msg "$D\t packages has been installed."
+ msg "$SEP packages has been installed."
  return 0
 }
 
@@ -163,7 +184,7 @@ set_java_home(){
  export PATH=$PATH:/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/
  echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/" >> /etc/profile
  echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/" >> ~/.bashrc
- msg "$D\t JAVA HOME has been set."
+ msg "$SEP JAVA HOME has been set."
  return 0
 }
 
@@ -171,16 +192,16 @@ set_java_home(){
 init_test_mysql(){
  service mysqld start 
  /usr/bin/mysqladmin -u root password 'mysql'
- msg "$D\t Currect MySQL version is: $(mysql -uroot --batch --silent -pmysql -e 'select version()')\n"
+ msg "$SEP Currect MySQL version is: $(mysql -uroot --batch --silent -pmysql -e 'select version()')\n"
  mysql --batch --silent -uroot -pmysql -e 'create database eas_db';
- msg "$D\t eas_db has been created. MySQL user and password is: root/mysql\n"
+ msg "$SEP eas_db has been created. MySQL user and password is: root/mysql\n"
  read -sn 1 -p 'Press any key to continue...';echo
  return 0
 }
 
 #setup mysql server or client
 setup_mysql(){
- msg  "$D\t Sever type: $1"
+ msg  "$SEP Sever type: $1"
  wget http://goo.gl/4TyKNk
  yum -y localinstall mysql-community-release-el6-3.noarch.rpm
 
@@ -193,12 +214,12 @@ setup_mysql(){
   elif [ "$1" == "prod" ]
   then
 	yum -y install mysql #prod
-	msg "$D\t MySQL CLIENT has been install\n"
+	msg "$SEP MySQL CLIENT has been install\n"
 	read -sn 1 -p 'It is PROD SERVER! Press any key to continue...';echo
 	return 0
   else
  	T="test"
-  	msg "$D\t Cannot parse -t parameter. Going to use default TEST params envarioment.\n"
+  	msg "$SEP Cannot parse -t parameter. Going to use default TEST params envarioment.\n"
 	read -sn 1 -p 'It is TEST SERVER! Press any key to continue...';echo
 	yum -y install mysql mysql-server #test server
         init_test_mysql #init mysql
@@ -210,7 +231,7 @@ setup_mysql(){
 setup_tomcat(){
  wget -q http://archive.apache.org/dist/tomcat/tomcat-7/?C=M;O=A
  CURRENT_VERSION=$(cat index.html\?C\=M  | grep -vi beta |grep -i folder.gif | grep  7.0.* | tail -1 | awk -F 'v' '{ print $2 }'| awk -F '/' '{ print $1 }');
- msg "$D\t Tomcat version: $CURRENT_VERSION" 
+ msg "$SEP Tomcat version: $CURRENT_VERSION" 
 
  TOMCAT="http://archive.apache.org/dist/tomcat/tomcat-7/v$CURRENT_VERSION/bin/apache-tomcat-$CURRENT_VERSION.tar.gz"
  T7PATH="/usr/local/tomcat7/"
@@ -262,7 +283,7 @@ setup_tomcat(){
  sudo /etc/init.d/iptables save
  cd /usr/local/tomcat7/webapps/
  rm -rf ROOT/
- msg "$D\t Tomcat has been installed."
+ msg "$SEP Tomcat has been installed."
  return 0
 }
 
@@ -272,7 +293,7 @@ setenv(){
  echo -e "export JAVA_OPTS=\"-Xms256m -Xmx512m\""  > setenv.sh
  chown tomcat:tomcat setenv.sh
  chmod +x setenv.sh
- msg "$D\t Set env script has been created."
+ msg "$SEP Set env script has been created."
  return 0
 }
 
@@ -287,7 +308,7 @@ dwn_extras(){
  cp /tmp/jars/tomcat-juli*.jar $T7LIB
  chown tomcat:tomcat * $T7LIB
  chmod 777 * $T7LIB
- msg "$D\t Extra jars has been downloaded."
+ msg "$SEP Extra jars has been downloaded."
  return 0
 }
 
@@ -300,7 +321,7 @@ setup_tomcat_config(){
  #mkdir for eas notification
  mkdir -p /usr/eas/notifications
  service tomcat7 start
- msg "$D\t Tomcat has been install; Port 7498; To restart tomcat: service tomcat7 restart"
+ msg "$SEP Tomcat has been install; Port 7498; To restart tomcat: service tomcat7 restart"
  return 0
 }
 
@@ -309,7 +330,7 @@ other_stuff(){
  cd /
  mkdir -p temp/atomikos-sw-tmp
  chmod -R 777 temp/
- msg "$D\t Other stuff"
+ msg "$SEP Other stuff"
  return 0
 }
 
@@ -336,7 +357,7 @@ solr_setup(){
 	#up solr
 	cd /usr/local/solr/example
 	nohup java -Dsolr.solr.home=/usr/local/solr/example/example-DIH/solr -jar start.jar > /var/log/solr.log 2>&1 &
-	msg "$D\t Solr is upping... Please wait 60 sec."
+	msg "$SEP Solr is upping... Please wait 60 sec."
 	echo -e "\n"
 	sleep 60
 	read -sn 1 -p "Solr is up. Please check it at: http://domain-name:8983/solr/. Then press any key to continue and stop solr"
@@ -353,7 +374,7 @@ solr_setup(){
 	cd /usr/local/solr/prod
 	mv example-DIH/ new_mentor/
 	cd /usr/local/solr/prod
-	msg "$D\t Solr is upping... Please wait 60 sec.\n"
+	msg "$SEP Solr is upping... Please wait 60 sec.\n"
 	sleep 60
 	java -Dsolr.solr.home=/usr/local/solr/prod/new_mentor/solr -jar start.jar > /var/log/solr.log 2>&1 &
 	read -sn 1 -p "Solr is up. Please check it at: http://domain-name:8983/solr/. Then press any key to continue and stop solr.."
@@ -381,32 +402,304 @@ solr_setup(){
 	cd /usr/local/solr/prod/solr-webapp/webapp/WEB-INF/
 	sed -i '26i <listener>\n  <listener-class>\n    org.apache.solr.handler.dataimport.scheduler.ApplicationListener\n  </listener-class>\n</listener>\n' web.xml
 
-	msg "$D\t Solr has been installed."
+	msg "$SEP Solr has been installed."
 	return 0;
     else
-	msg "$D\t Solr didnt install."
+	msg "$SEP Solr didnt install."
 	return 0;
   fi
 }
 
 
+## ------------------- doc2 functions section ---------------------- ###
 
-## ------------------- call functions sections --------------------- ###
-check_rights;
-parse_args "$@";
-resize_root_fs;
-change_ssh_port 22022
-add_iptables_rules 22022
-sys_up
-get_pack java-1.7.0-openjdk.x86_64 java-1.7.0-openjdk-devel.x86_64 dos2unix ant subversion wget 
-set_java_home
-setup_mysql $T
-setup_tomcat
-setenv
-dwn_extras $U $P
-setup_tomcat_config
-other_stuff
-solr_setup $S
+#check OS 
+check_os(){
+  if ! cat /etc/redhat-release | grep -iE 'centos|rhel|fedora|red|hat'; then
+    msg "$SEP Incorrect OS!"
+    stop_exec;
+    exit 1;
+  fi
+}
+
+#print doc2 script help
+doc2_help() {
+  msg "\nscript usage:\n"
+  msg "Example0: $0 -u USER -p PASSWORD -s sprint_name -t prod or test (all other args will be use as test) -r relative_host_url -v 1.2.4 -p db_password \n"
+  msg "Example1: $0 -u bogdan -p qwerty -t test -v 1.2.4 -r relative_host_url\n"
+  msg "Example2: $0 -u bogdan -p qwerty -t test -v 1.2.4\n"
+  msg "Example3: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -r relative_host_url -v 1.2.4 -d db_password     #will set prod db password: db_password \n"
+  msg "Example4: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -r relative_host_url -v 1.2.4 -d default     #default password will be used \n"
+  msg "Example5: $0 -s sprint13_130916 -u bogdan -p qwerty -t prod -r relative_host_url -v 1.2.4 -d     #will delete prod db password from all configs \n"
+  msg "Example6: $0 -s sprint_name -u bogdan -p qwerty -r relative_host_url -t BLA_BLA_INFO -v 1.2.4 \n"
+  exit 1;
+}
+
+#print doc2 greetings
+doc2_greetings() {
+ msg "SCRIPT EXECUTED WITH NEXT PARAMETERS:\n"
+ msg "-u - SVN USER: $U\n"
+ msg "-p - SVN PASSWORD: $P\n"       
+ msg "-t - ENVIRONMENT: $T\n"
+ msg "-s - SPRINT NAME: $S\n"
+ msg "-v - VERSION: $V\n"
+ msg "-r - relative_host_url: $R (if it's empty, default value will be used;)\n"
+ msg "-d - DB PASSWORD: $D This is applied ONLY FOR PROD server\n"
+ read -sn 1 -p "Check them and press any key to continue..."
+ msg "\n"
+ return 0
+}
+
+#parse doc2 args
+parse_args_doc2(){
+if (compare_count "$#" 8 )
+ then
+        msg "$SEP Parsing params...  $#"
+        while getopts "r:u:p:t:s:v:d:" opt; do
+            case "$opt" in
+            u) U=$OPTARG
+                ;;
+            p) P=$OPTARG
+                ;;
+            t) T=$OPTARG
+                ;;
+	    s) S=$OPTARG
+		;;
+	    v) V=$OPTARG
+		;;
+	    r) R=$OPTARG
+		;;
+	    d) D=$OPTARG
+		;;
+            esac
+        done
+	doc2_greetings #call greatings
+ else
+   doc2_help #call print help
+ fi 
+}
+
+#create-remove test dir
+create_remove_dirs(){ 
+ msg "$SEP Create-remove new build dir"
+ rm -rf ~/build/
+ mkdir -p ~/build/
+ cd ~/build/
+ return 0
+}
+
+#check env type prod/test
+#$1 - env
+check_env_type() {
+if [ "$1" == "test" ]; then
+     return 0;
+ else 
+     return 1;
+ fi
+}
+
+# checkout code from SVN
+# $1 - env $T
+# $2 - SVN user $U
+# $3 - SVN password $P
+# $4 - sprint name
+
+ch_code(){
+ if (check_env_type $1)
+    then
+      msg "$SEP Goint to checkout $1 code. SVN account: $2/$3"
+      svn checkout https://motive.svn.beanstalkapp.com/eas/trunk/ trunk/ --username=$2 --password=$3
+      return 0;
+    else
+        if [ ! -z "$4" ];then
+           msg "$SEP Goint to checkout $1 code. SVN account: $2/$3; Code path: $4"
+           svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$4/ prod/ --username=$2 --password=$3
+           return 0;
+        else
+	   msg "$SEP ERROR!!! Please enter scrint name"
+	   stop_exec
+           return 1;
+        fi
+  fi
+
+  msg "$SEP ERROR! Cannot checkout code!"
+  stop_exec
+  return 1;
+}
+
+# Change prod DB password (use not standart)
+# $1 - env type
+
+change_prod_db_password(){
+ if (check_env_type $1); then
+      msg "$SEP Its test env, so default DB password will used";
+      return 0;
+    else
+       #get DEFAULT_DB_PASSWORD
+   	DEFAULT_DB_PASSWORD=$(cat  ~/build/prod/notification-manager/custom.properties_prod | grep -i db_password | grep -v "#" | awk -F '=' '{ print $2 }')   	
+	if [ "$D" == "default" ]; then
+	    D=$DEFAULT_DB_PASSWORD
+	    msg "$SEP Default DB password will used";
+            return 0
+	else
+	    msg "$SEP Custom DB password: $D; if DB password is empty it will delete db password from all configs";
+	    return 0
+    	fi
+	return 1;
+  fi
+
+  msg "$SEP ERROR! Cannot change DB password!"
+  stop_exec
+  return 1;
+}
+
+# put build version
+# $1 - env type
+# $2 - build version
+
+set_build_version () {  
+  if (check_env_type $1); then
+    dos2unix ~/build/trunk/eas/resources/custom.properties_awstest
+    sed -i -r 's/build_version=.*/build_version='$2'/'  ~/build/trunk/eas/resources/custom.properties_awstest
+    msg "$SEP Build version: $V"
+    return 0
+  else
+    dos2unix ~/build/prod/eas/resources/custom.properties_prod
+    sed -i -r 's/build_version=.*/build_version='$2'/'  ~/build/prod/eas/resources/custom.properties_prod
+    msg "$SEP Build version: $V"
+    return 0
+  fi
+
+  msg "$SEP ERROR! Cannot set version!"
+  stop_exec
+  return 1;
+}
+
+# set relative url
+# $1 - env type $T
+# $2 - relative url $R
+
+set_relative_url() {  
+  if (check_env_type $1); then
+    if ! [ -z "$2" ]; then
+	 sed -i -r 's/relative_host_url=.*/relative_host_url=\/\/'$2'/'  ~/build/trunk/eas/resources/custom.properties_awstest
+    fi
+    msg "$SEP Relative url: $2"
+    return 0
+  else
+    msg "$SEP Relative url: $2"
+    if ! [ -z "$2" ]; then
+	 sed -i -r 's/relative_host_url=.*/relative_host_url=\/\/'$2'/'  ~/build/prod/eas/resources/custom.properties_prod
+    fi
+    return 0
+  fi
+
+  msg "$SEP ERROR! Cannot set relative url!"
+  stop_exec
+  return 1;
+}
+
+# change win to unix encoding, fix configs, remove DB passwords from config files
+# $1 - env type
+# $2 - db password $D
+change_prod_configs() {
+  if (! check_env_type $1); then
+	dos2unix ~/build/prod/notification-manager/custom.properties_prod
+	sed -i -r 's/db_password=.*/db_password='$2'/' ~/build/prod/notification-manager/custom.properties_prod
+	dos2unix ~/build/prod/flyway-2.2.1/conf/flyway.properties_prod
+	sed -i -r 's/flyway.password=.*/flyway.password='$2'/' ~/build/prod/flyway-2.2.1/conf/flyway.properties_prod
+	dos2unix ~/build/prod/eas/resources/eas-dao.properties_prod
+	sed -i -r 's/MySQL_EAS.connection.password=.*/MySQL_EAS.connection.password='$2'/' ~/build/prod/eas/resources/eas-dao.properties_prod
+	msg "$SEP Configs has been changed"
+	return 0;
+  else 
+	msg "$SEP This is $1 env. Going to use default configs"
+	return 0;
+  fi
+
+  msg "$SEP ERROR! Cannot change prod configs!"
+  stop_exec
+  return 1;
+}
+
+
+# prepare eas war file
+# $1 env type
+
+build_eas() {
+  if (check_env_type $1); then
+    cd ~/build/trunk/eas/
+    ant -f build-eas.xml clean war-awstest
+    msg "$SEP $1 eas.war is ready"
+    return 0;
+  else 
+      #prod  
+      cd ~/build/prod/eas/
+      ant -f build-eas.xml clean war-production
+      msg "$SEP $1 eas.war is ready"
+      return 0;
+  fi
+
+  msg "$SEP ERROR! Can not build eas.war"
+  stop_exec
+  return 1;
+}
+
+
+# build notificatopm manager
+# $1 env type
+
+build_notif_manager(){
+  if (check_env_type $1); then
+    #build notif. manager
+    cd ~/build/trunk/notification-manager
+    ant -f build.xml clean build-awstest 
+    msg "$SEP $1 notif. manager is ready"
+    return 0;
+  else 
+    #build notif. manager
+    cd ~/build/prod/notification-manager
+    ant -f build.xml clean build-prod
+    msg "$SEP $1 notif. manager is ready"
+    return 0;
+  fi
+
+  msg "$SEP ERROR! Can not build notif. manager war"
+  stop_exec
+  return 1;
+}
+
+
+
+## ------------------- call functions sections (all for doc1.sh)--------------------- ###
+## --------------------------- doc1.sh as function call ----------------------------- ###
+#check_rights
+#parse_args "$@"
+#resize_root_fs
+#change_ssh_port 22022
+#add_iptables_rules 22022
+#sys_up
+#get_pack java-1.7.0-openjdk.x86_64 java-1.7.0-openjdk-devel.x86_64 dos2unix ant subversion wget 
+#set_java_home
+#setup_mysql $T
+#setup_tomcat
+#setenv
+#dwn_extras $U $P
+#setup_tomcat_config
+#other_stuff
+#solr_setup $S
  
 
+## ------------------- call functions sections (all for doc2.sh)--------------------- ###
+## --------------------------- doc2.sh as function call ----------------------------- ###
+check_rights
+check_os
+parse_args_doc2 "$@"
+#create_remove_dirs
+ch_code $T $U $P $S
+change_prod_db_password $T
+set_build_version $T $V
+set_relative_url $T $R
+change_prod_configs $T $D
+build_eas $T
 
