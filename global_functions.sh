@@ -59,7 +59,10 @@ list_functions() {
   msg " - change_prod_configs() - Set change prod configs. Input parameters: env type; db password (-d)"
   msg " - build_eas() - build eas war via ant. Input parameters: env type"
   msg " - build_notif_manager() - build notif manager via ant. Input parameters: env type"
-
+  msg " - swich_prod_configs() - move prod configs. Input parameters: env type"
+  msg " - doc2_print_warn() - prinnt doc2 env. Input parameters: env type"
+  msg " - kill_main_services() - stop main services"
+  msg " - flyway_migration() - perform flyway migration"
 }
 
 #print message
@@ -669,7 +672,104 @@ build_notif_manager(){
   return 1;
 }
 
+# swich configs to prod; Switch the flyway parameter file for production only 
+# $1 env type
 
+swich_prod_configs(){
+  if(! check_env_type $1); then
+    cd ~/build/prod/flyway-2.2.1/conf
+    cp -rf flyway.properties_prod flyway.properties
+    cd ~/build/prod/solr/new_mentor/solr/eas/conf
+    cp -rf solr-eas-config_prod.xml solr-eas-config.xml
+    msg "$SEP $1 prod configs has been moved"
+    return 0;
+  else 
+    msg "$SEP You dont need to move $1 configs"
+    return 0;
+  fi
+
+  msg "$SEP ERROR! Can not swich configs to prod"
+  stop_exec
+  return 1;
+}
+
+
+# print messages
+# $1 - env type
+
+doc2_print_warn(){
+  if(check_env_type $1); then
+     msg "$SEP Solr files: ~/build/trunk/solr/new_mentor/"
+     msg "$SEP Flyway migration files: ~/build/trunk/flyway-2.2.1/"
+     msg "$SEP eas.war: ~/build/trunk/eas/output/dist/eas.war"
+     msg "$SEP Going to stop sorl, tomcat and notification"
+     return 0;
+  else
+     msg "$SEP Solr files: ~/build/prod/solr/new_mentor/"
+     msg "$SEP Flyway migration files: ~/build/prod/flyway-2.2.1/"
+     msg "$SEP eas.war: ~/build/prod/eas/output/dist/eas.war"
+     msg "$SEP Going to stop sorl, tomcat and notification"
+     return 0;
+  fi
+
+  msg "$SEP ERROR! Cannot print $1 messages"
+  stop_exec
+  return 1;
+}
+
+# force kill proc
+kill_main_services(){
+ NOT_PID = $(ps auxw | grep -iv grep | grep -i notifications | grep -i jar |  awk -F ' ' '{ print $2 }')
+ SOLR_PID = $(ps auxw | grep -v grep | grep -i solr |  awk -F ' ' '{ print $2 }')
+ TOM_PID = $(ps auxw | grep -i tomcat | grep -iv grep |  awk -F ' ' '{ print $2 }')
+ 
+ msg "$SEP PIDs: Notif: $NOT_PID Solr: $SOLR_PID Tomcat: $TOM_PID"
+
+ if ! [ -z "$NOT_PID" ]; then
+     kill -9 $NOT_PID
+     msg "$SEP Notification PID: $NOT_PID. Killed"
+ else
+     msg "$SEP Notification is not started"
+ fi
+
+ if ! [ -z "$SOLR_PID" ]; then
+     kill -9 $SOLR_PID
+     msg "$SEP Solr PID: $SOLR_PID. Killed"
+ else
+     msg "$SEP Solr is not started"
+ fi
+
+ if ! [ -z "$TOM_PID" ]; then
+     kill -9 $TOM_PID 	
+     msg "$SEP Tomcat PID: $TOM_PID. Killed"
+ else
+     msg "$SEP Tomcat is not started"
+ fi
+ return 0;
+}
+
+# Flyway migration - use  flyway.properties
+# $1 - env type 
+
+flyway_migration(){
+ if (check_env_type $1); then
+    cd	 ~/build/trunk/flyway-2.2.1
+    chmod +x flyway
+    ./flyway -X migrate
+     msg "$SEP $1 migration has been performed"
+     return 0;
+  else 
+    cd	 ~/build/prod/flyway-2.2.1
+    chmod +x flyway
+    ./flyway -X migrate
+     msg "$SEP $1 migration has been performed"
+     return 0;
+  fi
+
+  msg "$SEP ERROR! Cannot perform flyway migration !!!"
+  stop_exec
+  return 1;
+}
 
 ## ------------------- call functions sections (all for doc1.sh)--------------------- ###
 ## --------------------------- doc1.sh as function call ----------------------------- ###
@@ -695,11 +795,16 @@ build_notif_manager(){
 check_rights
 check_os
 parse_args_doc2 "$@"
-#create_remove_dirs
+create_remove_dirs
 ch_code $T $U $P $S
 change_prod_db_password $T
 set_build_version $T $V
 set_relative_url $T $R
 change_prod_configs $T $D
 build_eas $T
+build_notif_manager $T #test it 
+swich_prod_configs $T #test it 
+doc2_print_warn $T #test it 
+kill_main_services #test it 
+flyway_migration $T #test it
 
