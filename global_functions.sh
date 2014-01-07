@@ -817,6 +817,7 @@ prepare_solr(){
     chmod +x solr.sh
     echo -e "java -Dsolr.solr.home=/usr/local/solr/trunk/new_mentor/solr/ -jar start.jar >  /var/log/solr.log 2>&1 &" > solr.sh
     msg "$SEP $1 solr is prepared"
+    return 0
   else 
     dos2unix /usr/local/solr/prod/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
     sed -i -r 's/password=.*/password="'$2'" \/>/' /usr/local/solr/prod/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
@@ -827,6 +828,7 @@ prepare_solr(){
     chmod +x solr.sh
     echo -e "java -Dsolr.solr.home=/usr/local/solr/prod/new_mentor/solr/ -jar start.jar > /var/log/solr.log 2>&1 &" > solr.sh
     msg "$SEP $1 solr is prepared"
+    return 0
   fi
 
   msg "$SEP ERROR! Cannot prepare solr !!!"
@@ -839,18 +841,22 @@ prepare_solr(){
 # $1 - env type
 
 up_solr(){
- if (check_env_type $1); then
+  if (check_env_type $1); then
+    msg "$SEP Going to up $1 solr."
     cd /usr/local/solr/trunk  
     ./solr.sh
     read -sn 1 -p 'Going to start solr. Press any key to continue... and wait 45 sec.';echo
     sleep 45
-    msg "$SEP ERROR! Cannot up $1 solr !!!"
+    msg "$SEP $1 solr is up! Please check it at: http://domain-name:8983/solr/"
+    return 0
   else 
+    msg "$SEP Going to up $1 solr."
     cd /usr/local/solr/prod
     ./solr.sh
     read -sn 1 -p 'Going to start solr. Press any key to continue... and wait 45 sec.';echo
     sleep 45
-    msg "$SEP ERROR! Cannot up $1 solr !!!"
+    msg "$SEP $1 solr is up! Please check it at: http://domain-name:8983/solr/"
+    return 0
   fi
 
   msg "$SEP ERROR! Cannot up solr !!!"
