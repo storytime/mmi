@@ -7,6 +7,7 @@
 . global_functions.sh # include global functions file
 
 ## ------------------- declare vars section------------------- ###
+
 trap '' INT
 P=""
 U=""
@@ -39,3 +40,5 @@ dwn_extras $U $P # download extra packages
 setup_tomcat_config # setup tomcat 
 other_stuff # other stuff 
 solr_setup $S # setup solr
+
+/bin/bash

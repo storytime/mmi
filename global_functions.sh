@@ -511,12 +511,12 @@ ch_code(){
  if (check_env_type $1)
     then
       msg "$SEP Goint to checkout $1 code. SVN account: $2/$3"
-      svn checkout https://motive.svn.beanstalkapp.com/eas/trunk/ trunk/ --username=$2 --password=$3
+      svn checkout https://motive.svn.beanstalkapp.com/eas/trunk/  ~/build/trunk/ --username=$2 --password=$3
       return 0;
     else
         if [ ! -z "$4" ];then
            msg "$SEP Goint to checkout $1 code. SVN account: $2/$3; Code path: $4"
-           svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$4/ prod/ --username=$2 --password=$3
+           svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$4/  ~/build/prod/ --username=$2 --password=$3
            return 0;
         else
 	   msg "$SEP ERROR!!! Please enter scrint name"
@@ -788,23 +788,24 @@ flyway_migration(){
 #setup_tomcat_config
 #other_stuff
 #solr_setup $S
- 
+
 
 ## ------------------- call functions sections (all for doc2.sh)--------------------- ###
 ## --------------------------- doc2.sh as function call ----------------------------- ###
-check_rights
-check_os
-parse_args_doc2 "$@"
-create_remove_dirs
-ch_code $T $U $P $S
-change_prod_db_password $T
-set_build_version $T $V
-set_relative_url $T $R
-change_prod_configs $T $D
-build_eas $T
-build_notif_manager $T #test it 
-swich_prod_configs $T #test it 
-doc2_print_warn $T #test it 
-kill_main_services #test it 
-flyway_migration $T #test it
+#check_rights
+#check_os
+#parse_args_doc2 "$@"
+#create_remove_dirs
+#ch_code $T $U $P $S
+#change_prod_db_password $T
+#set_build_version $T $V
+#set_relative_url $T $R
+#change_prod_configs $T $D
+#build_eas $T
+#build_notif_manager $T #test it 
+#swich_prod_configs $T #test it 
+#doc2_print_warn $T #test it 
+#kill_main_services #test it 
+#flyway_migration $T #test it
+
 
