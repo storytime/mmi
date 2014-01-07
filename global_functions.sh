@@ -62,7 +62,12 @@ list_functions() {
   msg " - swich_prod_configs() - move prod configs. Input parameters: env type"
   msg " - doc2_print_warn() - prinnt doc2 env. Input parameters: env type"
   msg " - kill_main_services() - stop main services"
-  msg " - flyway_migration() - perform flyway migration"
+  msg " - flyway_migration() - perform flyway migration;  Input parameters: env typ"
+  msg " - checkout_solr() - checkout solr;  Input parameters: env type; SVN user; SVN password; sprint name"
+  msg " - prepare_solr() - prepare solr;  Input parameters: env type;  db password  only for prod"
+  msg " - up_solr() - start solr; Input parameters: env type;"
+
+
 }
 
 #print message
@@ -771,6 +776,91 @@ flyway_migration(){
   return 1;
 }
 
+# checkout sorl
+# $1 - env type
+# $2 - SVN user
+# $3 - SVN password
+# $4 - Sprint name
+
+checkout_solr() {
+ if (check_env_type $1); then
+    read -sn 1 -p 'Solr deployment part! Press any key to continue...';echo
+    cd /usr/local/solr/trunk/new_mentor
+    rm -rf solr/
+    svn checkout https://motive.svn.beanstalkapp.com/eas/trunk/solr/new_mentor/solr/ solr/  --username=$2 --password=$3
+    msg "$SEP $1  solr hase been downloaded"
+    return 0;
+  else 
+    read -sn 1 -p 'Solr deployment part!..';echo
+    cd /usr/local/solr/prod/new_mentor
+    rm -rf solr/
+    svn checkout https://motive.svn.beanstalkapp.com/eas/branches/$4/solr/new_mentor/solr/ solr/  --username=$2 --password=$3
+    msg "$SEP $1 solr hase been downloaded"
+    return 0;
+  fi
+
+  msg "$SEP ERROR! Cannot checkout solr !!!"
+  stop_exec
+  return 1;
+}
+
+# prepare solr
+# $1 - env ty
+# $2 - db password / $D #only for prod
+
+prepare_solr(){
+ if (check_env_type $1); then
+    cd /usr/local/solr/trunk/new_mentor/solr
+    cp /usr/local/solr/trunk/start.jar .
+    cd /usr/local/solr/trunk  
+    touch solr.sh
+    chmod +x solr.sh
+    echo -e "java -Dsolr.solr.home=/usr/local/solr/trunk/new_mentor/solr/ -jar start.jar >  /var/log/solr.log 2>&1 &" > solr.sh
+    msg "$SEP $1 solr is prepared"
+  else 
+    dos2unix /usr/local/solr/prod/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
+    sed -i -r 's/password=.*/password="'$2'" \/>/' /usr/local/solr/prod/new_mentor/solr/eas/conf/solr-eas-config_prod.xml
+    cd /usr/local/solr/prod/new_mentor/solr
+    cp /usr/local/solr/prod/start.jar .
+    cd /usr/local/solr/prod
+    touch solr.sh
+    chmod +x solr.sh
+    echo -e "java -Dsolr.solr.home=/usr/local/solr/prod/new_mentor/solr/ -jar start.jar > /var/log/solr.log 2>&1 &" > solr.sh
+    msg "$SEP $1 solr is prepared"
+  fi
+
+  msg "$SEP ERROR! Cannot prepare solr !!!"
+  stop_exec
+  return 1;
+}
+
+
+# up solr
+# $1 - env type
+
+up_solr(){
+ if (check_env_type $1); then
+    cd /usr/local/solr/trunk  
+    ./solr.sh
+    read -sn 1 -p 'Going to start solr. Press any key to continue... and wait 45 sec.';echo
+    sleep 45
+    msg "$SEP ERROR! Cannot up $1 solr !!!"
+  else 
+    cd /usr/local/solr/prod
+    ./solr.sh
+    read -sn 1 -p 'Going to start solr. Press any key to continue... and wait 45 sec.';echo
+    sleep 45
+    msg "$SEP ERROR! Cannot up $1 solr !!!"
+  fi
+
+  msg "$SEP ERROR! Cannot up solr !!!"
+  stop_exec
+  return 1;
+}
+
+
+
+
 ## ------------------- call functions sections (all for doc1.sh)--------------------- ###
 ## --------------------------- doc1.sh as function call ----------------------------- ###
 #check_rights
@@ -787,25 +877,28 @@ flyway_migration(){
 #dwn_extras $U $P
 #setup_tomcat_config
 #other_stuff
-#solr_setup $S
+#solr_setup $S 
+
 
 
 ## ------------------- call functions sections (all for doc2.sh)--------------------- ###
 ## --------------------------- doc2.sh as function call ----------------------------- ###
-#check_rights
-#check_os
-#parse_args_doc2 "$@"
-#create_remove_dirs
-#ch_code $T $U $P $S
-#change_prod_db_password $T
-#set_build_version $T $V
-#set_relative_url $T $R
-#change_prod_configs $T $D
-#build_eas $T
-#build_notif_manager $T #test it 
-#swich_prod_configs $T #test it 
-#doc2_print_warn $T #test it 
-#kill_main_services #test it 
-#flyway_migration $T #test it
-
+ check_rights
+ check_os
+ parse_args_doc2 "$@"
+ create_remove_dirs
+ ch_code $T $U $P $S
+ change_prod_db_password $T
+ set_build_version $T $V
+ set_relative_url $T $R
+ change_prod_configs $T $D
+ build_eas $T
+ build_notif_manager $T #test it 
+ swich_prod_configs $T #test it 
+ doc2_print_warn $T #test it 
+ kill_main_services #test it 
+ flyway_migration $T #test it
+ checkout_solr $T $U $P $S
+ prepare_solr $T $D
+ up_solr $T
 
