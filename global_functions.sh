@@ -727,8 +727,6 @@ kill_main_services(){
  NOT_PID = $(ps auxw | grep -iv grep | grep -i notifications | grep -i jar |  awk -F ' ' '{ print $2 }')
  SOLR_PID = $(ps auxw | grep -v grep | grep -i solr |  awk -F ' ' '{ print $2 }')
  TOM_PID = $(ps auxw | grep -i tomcat | grep -iv grep |  awk -F ' ' '{ print $2 }')
- 
- msg "$SEP PIDs: Notif: $NOT_PID Solr: $SOLR_PID Tomcat: $TOM_PID"
 
  if ! [ -z "$NOT_PID" ]; then
      kill -9 $NOT_PID
@@ -750,6 +748,9 @@ kill_main_services(){
  else
      msg "$SEP Tomcat is not started"
  fi
+  
+ # msg "$SEP PIDs: Notif: $NOT_PID Solr: $SOLR_PID Tomcat: $TOM_PID"
+
  return 0;
 }
 
