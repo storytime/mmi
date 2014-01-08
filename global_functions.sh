@@ -724,9 +724,10 @@ doc2_print_warn(){
 
 # force kill proc
 kill_main_services(){
- NOT_PID = $(ps auxw | grep -iv grep | grep -i notifications | grep -i jar |  awk -F ' ' '{ print $2 }')
- SOLR_PID = $(ps auxw | grep -v grep | grep -i solr |  awk -F ' ' '{ print $2 }')
- TOM_PID = $(ps auxw | grep -i tomcat | grep -iv grep |  awk -F ' ' '{ print $2 }')
+
+ NOT_PID=$(ps auxw | grep -iv grep | grep -i notifications | grep -i jar |  awk -F ' ' '{ print $2 }')
+ SOLR_PID=$(ps auxw | grep -v grep | grep -i solr |  awk -F ' ' '{ print $2 }')
+ TOM_PID=$(ps auxw | grep -i tomcat | grep -iv grep |  awk -F ' ' '{ print $2 }')
 
  if ! [ -z "$NOT_PID" ]; then
      kill -9 $NOT_PID
