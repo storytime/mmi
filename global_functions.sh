@@ -891,22 +891,22 @@ up_solr(){
 
 ## ------------------- call functions sections (all for doc2.sh)--------------------- ###
 ## --------------------------- doc2.sh as function call ----------------------------- ###
- check_rights
- check_os
- parse_args_doc2 "$@"
- create_remove_dirs
- ch_code $T $U $P $S
- change_prod_db_password $T
- set_build_version $T $V
- set_relative_url $T $R
- change_prod_configs $T $D
- build_eas $T
- build_notif_manager $T #test it 
- swich_prod_configs $T #test it 
- doc2_print_warn $T #test it 
- kill_main_services #test it 
- flyway_migration $T #test it
- checkout_solr $T $U $P $S
- prepare_solr $T $D
- up_solr $T
+# check_rights
+# check_os
+# parse_args_doc2 "$@"
+# create_remove_dirs
+# ch_code $T $U $P $S
+# change_prod_db_password $T
+# set_build_version $T $V
+# set_relative_url $T $R
+# change_prod_configs $T $D
+# build_eas $T
+# build_notif_manager $T #test it 
+# swich_prod_configs $T #test it 
+# doc2_print_warn $T #test it 
+# kill_main_services #test it 
+# flyway_migration $T #test it
+# checkout_solr $T $U $P $S
+# prepare_solr $T $D
+#up_solr $T
 
