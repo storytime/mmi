@@ -908,5 +908,5 @@ up_solr(){
 # flyway_migration $T #test it
 # checkout_solr $T $U $P $S
 # prepare_solr $T $D
-#up_solr $T
+# up_solr $T
 
