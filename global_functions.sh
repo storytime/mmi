@@ -66,7 +66,7 @@ list_functions() {
   msg " - checkout_solr() - checkout solr;  Input parameters: env type; SVN user; SVN password; sprint name"
   msg " - prepare_solr() - prepare solr;  Input parameters: env type;  db password  only for prod"
   msg " - up_solr() - start solr; Input parameters: env type;"
-
+  msg " - other_doc2_setup() - start other server setup; Input parameters: env type;"
 
 }
 
@@ -864,6 +864,33 @@ up_solr(){
   msg "$SEP ERROR! Cannot up solr !!!"
   stop_exec
   return 1;
+}
+
+# other doc2 setup
+# $1 - env type
+
+other_doc2_setup(){
+
+  cd /usr/local/tomcat7/webapps/
+  rm -f ROOT.war
+  rm -rf ROOT/
+
+  if (check_env_type $1); then
+    cp ~/build/trunk/eas/output/dist/eas.war ROOT.war
+    service tomcat7 start
+    msg "$SEP $1 setup is over."
+    return 0;   
+  else
+    cp ~/build/prod/eas/output/dist/eas.war ROOT.war
+    service tomcat7 start
+    msg "$SEP $1 setup is over."
+    return 0;
+  fi
+
+  msg "$SEP ERROR! Cannot continue with other setup!"
+  stop_exec
+  return 1;
+
 }
 
 
