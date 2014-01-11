@@ -67,7 +67,7 @@ list_functions() {
   msg " - prepare_solr() - prepare solr;  Input parameters: env type;  db password  only for prod"
   msg " - up_solr() - start solr; Input parameters: env type;"
   msg " - other_doc2_setup() - start other server setup; Input parameters: env type;"
-
+  msg " - setup_notif_manager() - copy notification mamager. Input parameters: env type;"
 }
 
 #print message
@@ -890,10 +890,56 @@ other_doc2_setup(){
   msg "$SEP ERROR! Cannot continue with other setup!"
   stop_exec
   return 1;
+}
 
+# Copy notification manager files:
+# $1 - env type
+
+setup_notif_manager(){
+  if (check_env_type $1); then
+    cd /usr/eas/notifications/
+    cp ~/build/trunk/notification-manager/notifications.jar .
+    cp ~/build/trunk/notification-manager/custom.properties .
+    cp ~/build/trunk/notification-manager/notifications.sh .
+    cp ~/build/trunk/notification-manager/src/log4j.properties_prod log4j.properties
+    cp ~/build/trunk/notification-manager/new_user.st .
+    cp ~/build/trunk/notification-manager/password_reset.st .
+    cp ~/build/trunk/notification-manager/review_request.st .
+    cp ~/build/trunk/notification-manager/review_request.st .
+    chmod +x notifications.sh
+    sed -i -e 's/\r$//' notifications.sh
+    java -jar -Dlog4j.configuration=file:./log4j.properties notifications.jar > /var/log/notification.log 2>&1 &
+    msg "$SEP $1 setup notification manager is over."
+    return 0;
+  else
+    cd /usr/eas/notifications/
+    cp ~/build/prod/notification-manager/notifications.jar .
+    cp ~/build/prod/notification-manager/custom.properties .
+    cp ~/build/prod/notification-manager/notifications.sh .
+    cp ~/build/prod/notification-manager/src/log4j.properties_prod log4j.properties
+    cp ~/build/prod/notification-manager/new_user.st .
+    cp ~/build/prod/notification-manager/password_reset.st .
+    cp ~/build/prod/notification-manager/review_request.st .
+    cp ~/build/prod/notification-manager/review_request.st .
+    chmod +x notifications.sh
+    sed -i -e 's/\r$//' notifications.sh
+    java -jar -Dlog4j.configuration=file:./log4j.properties notifications.jar > /var/log/notification.log 2>&1 &
+    msg "$SEP $1 setup notification manager is over."
+    return 0;
+  fi
+
+  msg "$SEP ERROR! Cannot copy notification manager files!"
+  stop_exec
+  return 1;
 }
 
 
+# final message
+# $1 - env type
+
+final_msg() {
+  read -sn 1 -p "$SEP Server: $1 has been configured. Then press any key to exit... and wait 4-5min. Tomcat is starting!"
+}
 
 
 ## ------------------- call functions sections (all for doc1.sh)--------------------- ###

@@ -38,6 +38,9 @@ flyway_migration $T # call flyway migration
 checkout_solr $T $U $P $S # call checkout solr from repo
 prepare_solr $T $D # call prepare solr
 up_solr $T # call up solr method
+other_doc2_setup $T # call other setup
+setup_notif_manager $T # call copy notification mamager
+final_msg $T # call print final method
 
 
 
