@@ -962,11 +962,11 @@ check_return_resualt(){
     0)  return 0;
 	;;
     1)  msg "$SEP Function: $2 \t ERROR! Code: 1";
-	#stop_exec;
+	stop_exec;
 	;;
     2)  msg "$SEP Function: $2 \t ERROR! Code: 2";
-	#stop_exec;
-	;;)  
+	stop_exec;
+	;;  
     ## other erros codes
     *) msg "$SEP no such return code!"
       ;;
