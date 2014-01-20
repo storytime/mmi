@@ -258,9 +258,9 @@ setup_tomcat(){
 
  cd /tmp
  wget $TOMCAT
- tar xf apache-tomcat-7.0.47.tar.gz
+ tar xf apache-tomcat-$CURRENT_VERSION.tar.gz
  rm -rf $T7PATH
- mv apache-tomcat-7.0.47 $T7PATH
+ mv apache-tomcat-$CURRENT_VERSION $T7PATH
  cd /usr/local/tomcat7/bin/
  chmod +x *
  useradd -d /usr/share/tomcat -s /sbin/nologin tomcat
