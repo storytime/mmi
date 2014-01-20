@@ -269,6 +269,9 @@ setup_tomcat(){
 
  #create init script
  echo -e "#!/bin/bash
+ 
+ # chkconfig: <levels> <start> <stop>
+ # description: <some description>
 
  CATALINA_HOME=/usr/local/tomcat7
 
