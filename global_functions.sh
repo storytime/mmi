@@ -199,10 +199,14 @@ get_pack() {
 
 #prepare java home
 set_java_home(){
- export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/
- export PATH=$PATH:/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/
- echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/" >> /etc/profile
- echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/" >> ~/.bashrc
+
+ JAVA_VERSION=$(yum info java-1.7.0-openjdk.x86_64  | grep -i version |  awk -F ':' '{ print $2 }' | awk -F ' ' '{ print $1}')
+ msg "$SEP JAVA VERSION: $JAVA_VERSION"
+ export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-$JAVA_VERSION.x86_64/
+ export PATH=$PATH:/usr/lib/jvm/java-1.7.0-openjdk-$JAVA_VERSION.x86_64/
+ echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-$JAVA_VERSION.x86_64/" >> /etc/profile
+ echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-$JAVA_VERSION.x86_64/" >> ~/.bashrc
+ msg "$SEP JAVA HOME: export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-$JAVA_VERSION.x86_64/" 
  msg "$SEP JAVA HOME has been set."
  return $SUCCESS
 }
