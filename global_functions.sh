@@ -225,8 +225,10 @@ init_test_mysql(){
 #setup mysql server or client
 setup_mysql(){
  msg  "$SEP Sever type: $1"
- wget http://goo.gl/4TyKNk
- yum -y localinstall mysql-community-release-el6-3.noarch.rpm
+ # wget http://goo.gl/4TyKNk
+ wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
+ yum -y localinstall *.rpm
+ yum update 
 
  if [ "$1" == "test" ]
   then
