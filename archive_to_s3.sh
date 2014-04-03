@@ -292,10 +292,4 @@ if [ "$R" == "Yes" ]
    upload_one_file $L
 fi
 
-
-
 msg "\n$SEP SUCCESS! Execuded without error."
-
-#  AKIAIN5HPWEKQR4LPJXA
-#  obo8xkY5B8Tya0O535Znrl2nm1dOBaCvN9CotgBJ	
-#  ./archive_to_s3.sh -l apache.log - -b bucket_s3 -p /tmp/
