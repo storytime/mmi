@@ -54,7 +54,7 @@ Lyc scripts - lyc/
 
 ### Other scripts
 ##### archive_to_s3.sh
-archive_to_s3.sh - put file to AWS S3 bucket
+archive_to_s3.sh - put files to AWS S3 bucket
 
 ###### script usage:  
 
@@ -77,7 +77,7 @@ archive_to_s3.sh - put file to AWS S3 bucket
 <a href="http://i.imgur.com/I3ymQL6.png"><img src="http://i.imgur.com/I3ymQL6.png" title="Hosted by imgur.com" /></a>
 
 ##### s3_sync.sh
-s3_sync.sh - sync filed with AWS S3 bucket
+s3_sync.sh - sync files with AWS S3 bucket
 
 ###### script usage:  
 
