@@ -76,3 +76,20 @@ archive_to_s3.sh - put file to AWS S3 bucket
     
 <a href="http://i.imgur.com/I3ymQL6.png"><img src="http://i.imgur.com/I3ymQL6.png" title="Hosted by imgur.com" /></a>
 
+##### s3_sync.sh
+s3_sync.sh - sync filed with AWS S3 bucket
+
+###### script usage:  
+
+    ./s3_sync.sh -a ACCESS_KEY:SECRET:KEY
+    ./s3_sync.sh -p PATH_TO_SYNC_DIR
+
+
+###### Params:  
+
+    -a - ACCESS_KEY:SECRET:KEY - AWS keys
+    -p - Path to sync dir 
+    
+<a href="http://i.imgur.com/7qJ3m23.png"><img src="http://i.imgur.com/7qJ3m23.png" title="Hosted by imgur.com" /></a>
+
+
