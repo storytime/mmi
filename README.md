@@ -93,14 +93,12 @@ s3_sync.sh - sync files with AWS S3 bucket
 <a href="http://i.imgur.com/7qJ3m23.png"><img src="http://i.imgur.com/7qJ3m23.png" title="Hosted by imgur.com" /></a>
 
 ##### s3_sync_ext.sh
-s3_sync_ext.sh - Extended sync files with AWS S3 bucket
+s3_sync_ext.sh - Extended sync files with AWS S3 bucket. Sync dirs can be founded in script.
 
 ###### script usage:  
 
     ./s3_sync.sh -a ACCESS_KEY:SECRET:KEY
     
-    Sync dirs can be founded in script.
-
 ###### Params:  
 
     -a - ACCESS_KEY:SECRET:KEY - AWS keys
